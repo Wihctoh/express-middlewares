@@ -1,12 +1,12 @@
 const express = require("express");
+const router = express.Router();
 const {
   getAllUser,
+  deleteUser,
   getUserById,
-  createUser,
   updateUser,
+  patchUser,
 } = require("../service/user.service");
-
-const router = express.Router();
 
 router.get("/", (req, res) => {
   try {
@@ -18,11 +18,10 @@ router.get("/", (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {
+router.delete("/:id", (req, res) => {
   try {
     const { id } = req.params;
-
-    const data = getUserById(id);
+    const data = deleteUser(id);
 
     res.status(200).send(data);
   } catch (error) {
@@ -30,10 +29,10 @@ router.get("/:id", (req, res) => {
   }
 });
 
-router.post("/", (req, res) => {
+router.get("/:id", (req, res) => {
   try {
-    const { name, surname, email, pwd } = req.body;
-    const data = createUser(name, surname, email, pwd);
+    const { id } = req.params;
+    const data = getUserById(id);
 
     res.status(200).send(data);
   } catch (error) {
@@ -45,7 +44,6 @@ router.put("/:id", (req, res) => {
   try {
     const { id } = req.params;
     const { name, surname, email, pwd } = req.body;
-
     const data = updateUser(id, name, surname, email, pwd);
 
     res.status(200).send(data);
@@ -54,4 +52,16 @@ router.put("/:id", (req, res) => {
   }
 });
 
-module.exports = { router };
+router.patch("/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    const clientObj = req.body;
+    const data = patchUser(id, clientObj);
+
+    res.status(200).send(data);
+  } catch (error) {
+    res.status(404).send(error.message);
+  }
+});
+
+module.exports = router;
