@@ -1,6 +1,7 @@
 const express = require("express");
 const { Service } = require("../service/user.service");
 const { isValidUserId, isValidUserData } = require("../helper/validation");
+const buildResponse = require("../helper/buildResponse");
 
 const service = new Service();
 
@@ -15,20 +16,9 @@ class Controller {
       try {
         const data = service.getAllUser();
 
-        res.status(200).send(data);
+        buildResponse(res, 200, data);
       } catch (error) {
-        res.status(404).send(error.message);
-      }
-    });
-
-    this.router.delete("/:id", isValidUserId, (req, res) => {
-      try {
-        const { id } = req.params;
-        const data = service.deleteUser(id);
-
-        res.status(200).send(data);
-      } catch (error) {
-        res.status(404).send(error.message);
+        buildResponse(res, 404, error.message);
       }
     });
 
@@ -37,9 +27,20 @@ class Controller {
         const { id } = req.params;
         const data = service.getUserById(id);
 
-        res.status(200).send(data);
+        buildResponse(res, 200, data);
       } catch (error) {
-        res.status(404).send(error.message);
+        buildResponse(res, 404, error.message);
+      }
+    });
+
+    this.router.post("/", isValidUserData, (req, res) => {
+      try {
+        const { name, surname, email, pwd } = req.body;
+        const data = service.createUser(name, surname, email, pwd);
+
+        buildResponse(res, 201, data);
+      } catch (error) {
+        buildResponse(res, 405, error.message);
       }
     });
 
@@ -49,9 +50,20 @@ class Controller {
         const { name, surname, email, pwd } = req.body;
         const data = service.updateUser(id, name, surname, email, pwd);
 
-        res.status(200).send(data);
+        buildResponse(res, 200, data);
       } catch (error) {
-        res.status(404).send(error.message);
+        buildResponse(res, 404, error.message);
+      }
+    });
+
+    this.router.delete("/:id", isValidUserId, (req, res) => {
+      try {
+        const { id } = req.params;
+        const data = service.deleteUser(id);
+
+        buildResponse(res, 200, data);
+      } catch (error) {
+        buildResponse(res, 404, error.message);
       }
     });
 
@@ -61,9 +73,9 @@ class Controller {
         const clientObj = req.body;
         const data = service.patchUser(id, clientObj);
 
-        res.status(200).send(data);
+        buildResponse(res, 200, data);
       } catch (error) {
-        res.status(404).send(error.message);
+        buildResponse(res, 404, error.message);
       }
     });
   }
